@@ -70,11 +70,11 @@ class Server
     @app = http.createServer @handler
     @io = io.listen @app
 
-    @io.configure 'production', () ->
+    @io.configure 'production', () =>
       @io.set 'log level', 1
       @io.set 'transports', ['websocket','flashsocket','jsonp-polling']
 
-    @io.configure 'development', () ->
+    @io.configure 'development', () =>
       @io.set 'transports', ['websocket','flashsocket','jsonp-polling']
 
   start: ->
