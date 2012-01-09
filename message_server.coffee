@@ -71,8 +71,8 @@ class Server
     @io = io.listen @app
 
     @io.configure 'production', () =>
-      @io.set 'log level', 1
-      @io.set 'transports', ['websocket','flashsocket','jsonp-polling']
+      @io.set 'log level', 3
+      @io.set 'transports', ['websocket','flashsocket','htmlfile','jsonp-polling']
       @io.enable 'browser client minification'
       @io.enable 'browser client gzip'
       @io.enable 'browser client etag'
