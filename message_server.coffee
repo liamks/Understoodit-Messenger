@@ -56,9 +56,11 @@ class SocketClient
     @client.handle_disable_confusion_from_socket() if @client?
 
   understanding_from_client: (data) =>
+    data.time = (new Date()).getTime()
     @client.handle_understanding_from_socket data if @client?
 
   confusion_from_client: (data) =>
+    data.time = (new Date()).getTime()
     @client.handle_confusion_from_socket data if @client?
 
   disconnect: =>
