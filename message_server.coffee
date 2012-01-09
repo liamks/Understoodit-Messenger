@@ -73,6 +73,8 @@ class Server
     @io.configure 'production', () =>
       @io.set 'log level', 1
       @io.set 'transports', ['websocket','flashsocket','jsonp-polling']
+      @io.enable 'browser client minification'
+      @io.enable 'browser client gzip'
 
     @io.configure 'development', () =>
       @io.set 'transports', ['websocket','flashsocket','jsonp-polling']
