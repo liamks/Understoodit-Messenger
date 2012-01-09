@@ -75,6 +75,7 @@ class Server
       @io.set 'transports', ['websocket','flashsocket','jsonp-polling']
       @io.enable 'browser client minification'
       @io.enable 'browser client gzip'
+      @io.enable 'browser client etag'
 
     @io.configure 'development', () =>
       @io.set 'transports', ['websocket','flashsocket','jsonp-polling']
