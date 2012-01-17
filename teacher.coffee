@@ -4,11 +4,16 @@ lecture = require './lecture'
 class @Teacher extends client.Client
   constructor: (params, callback) ->
     super(params)
-    @lecture = new lecture.Lecture(@pub)
+    decay_mode = params.options.enable_decay
+    confusion_timeout = params.options.confusion_timeout
+    @lecture = new lecture.Lecture(@pub, decay_mode, confusion_timeout)
     @confusion_value = 0
     @understanding_value = 0
     @num_students = 0
-    @students_can_see_confusion = yes
+    @students_can_see_confusion = params.options.students_can_see_confusion
+    if not @students_can_see_confusion
+      @pub.publish  "#{@lecture.id}.broadcast.disable_confusion",''
+      
     @init(callback)
       
   init: (callback) ->

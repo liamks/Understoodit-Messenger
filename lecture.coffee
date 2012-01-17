@@ -1,7 +1,7 @@
 #mocha -R spec
 
 class @Lecture
-  constructor: (@pub) ->
+  constructor: (@pub, @decay_mode, @confusion_timeout) ->
     
   init_teacher: (teacher_id) ->
     @teacher_id = teacher_id
@@ -10,9 +10,7 @@ class @Lecture
     @student_ids = []
     # 3 minutes
     @CONFUSION_HALF_LIFE = 1000 * 60 * 3
-    # 4 minutes
-    @confusion_timeout = 1000 * 60 * 4
-    @decay_mode = yes
+
 
   init_student: (teacher_id, @student_id) ->
 
