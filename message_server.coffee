@@ -19,8 +19,9 @@ class SocketClient
 
   valid_tokens: (data) ->
     console.log data
+    empty_tokens = (data.token is '') and (data.token is '')
     client_has_token = data.token_1? and data.token_2?
-    return unless client_has_token
+    return unless client_has_token and not empty_tokens
 
     crypto.createHash('sha256').update(data.token_1 + secret).digest('hex') is data.token_2
 
@@ -43,11 +44,23 @@ class SocketClient
       new teacher.Teacher data, (c) =>
         @socket.on 'ec', @enable_confusion
         @socket.on 'dc', @disable_confusion
+        @socket.on 'rs', @reset_confusion_and_understanding
+
+        @socket.on 'dmt', @decay_mode_true
+        @socket.on 'dmf', @decay_mode_false
+
+        @socket.on 'dmto', (c) =>
+          @decay_mode_timeout c
+
         @client = c
         @client.add_send_to_client @send_to_client
 
+
   send_to_client: (message) =>
     @socket.emit 'm', message
+
+  reset_confusion_and_understanding: =>
+    @client.handle_confusion_and_understanding_reset_from_socket() if @client?
 
   enable_confusion: () =>
     @client.handle_enable_confusion_from_socket() if @client?
@@ -62,6 +75,15 @@ class SocketClient
   confusion_from_client: (data) =>
     data.time = (new Date()).getTime()
     @client.handle_confusion_from_socket data if @client?
+
+  decay_mode_true: () =>
+    @client.handle_decay_mode_true_from_socket() if @client?
+
+  decay_mode_false: () =>
+    @client.handle_decay_mode_false_from_socket() if @client?
+
+  decay_mode_timeout: (t) =>
+    @client.handle_new_confusion_timeout_from_socket(t) if @client?
 
   disconnect: =>
     @client.disconnect() if @client?

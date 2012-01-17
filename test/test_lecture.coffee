@@ -90,4 +90,33 @@ describe 'Lecture', ->
     lecture.add_confusion(confusion_without_time).should.be.false
     done()
 
+  it 'Must have an n=2 for 1 student id', (done) ->
+    lecture = make_lecture()
+    lecture.add_student student1.id
+    lecture.add_student student1.id
+    lecture.get_num_students().should.equal 1
+    lecture.students[student1.id].n.should.equal 2
+    done()
+
+  it 'Must have an n =0 after both students log off', (done) ->
+    lecture = make_lecture()
+    lecture.add_student student1.id
+    lecture.add_student student1.id
+    lecture.remove_student student1.id
+    lecture.students[student1.id].n.should.equal 1
+    lecture.remove_student student1.id
+    lecture.get_num_students().should.equal 0
+    done()
+
+  it 'Must have 100% confusion in non-decay mode', (done) ->
+    lecture = make_lecture()
+    lecture.add_student student1.id
+    lecture.set_decay_mode false
+    lecture.add_confusion(confusion1)
+
+    must_still_be_hundred = () ->
+      lecture.get_percent_confusion().should.equal 100
+      done()
+
+    setTimeout must_still_be_hundred, 1050
   

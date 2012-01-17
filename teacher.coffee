@@ -73,9 +73,9 @@ class @Teacher extends client.Client
 
     sub_actions =
       'add_confusion': (m) =>
-        @lecture.add_confusion(JSON.parse(m))
+        @lecture.add_confusion(JSON.parse(m)) unless @ignoring_students
       'add_understanding': (m) =>
-        @lecture.add_understanding(JSON.parse(m))
+        @lecture.add_understanding(JSON.parse(m)) unless @ignoring_students
 
       'get_id': (student_id) =>
         @pub.publish "#{student_id}.lecture.id", @lecture.id
@@ -110,6 +110,21 @@ class @Teacher extends client.Client
     @students_can_see_confusion = no
     @pub.publish  "#{@lecture.id}.broadcast.disable_confusion",''
 
+  handle_confusion_and_understanding_reset_from_socket: ->
+    @lecture.reset_understanding_and_confusion()
+
+  handle_decay_mode_true_from_socket: ->
+    @lecture.set_decay_mode true
+
+  handle_decay_mode_false_from_socket: ->
+    @lecture.set_decay_mode false
+
+  handle_new_confusion_timeout_from_socket: (num) ->
+    new_num = Number(num)
+    if new_num > 0
+      @lecture.set_confusion_timeout new_num
+      
+
   handle_message_from_socket: (message) ->
     console.log message
 
@@ -118,4 +133,7 @@ class @Teacher extends client.Client
 
   get_num_students: ->
     @lecture.get_num_students()
+
+  get_confusion_timeout: ->
+    @lecture.get_confusion_timeout();
 
