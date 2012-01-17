@@ -49,7 +49,7 @@ class SocketClient
         @socket.on 'dmt', @decay_mode_true
         @socket.on 'dmf', @decay_mode_false
 
-        @socket.on 'dmto', (c) =>
+        @socket.on 'cto', (c) =>
           @decay_mode_timeout c
 
         @client = c
