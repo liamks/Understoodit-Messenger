@@ -4,9 +4,9 @@ lecture = require './lecture'
 class @Teacher extends client.Client
   constructor: (params, callback) ->
     super(params)
-    decay_mode = params.options.enable_decay
+    @decay_enabled = params.options.enable_decay
     confusion_timeout = params.options.confusion_timeout
-    @lecture = new lecture.Lecture(@pub, decay_mode, confusion_timeout)
+    @lecture = new lecture.Lecture(@pub, @decay_enabled, confusion_timeout)
     @confusion_value = 0
     @understanding_value = 0
     @num_students = 0
@@ -20,11 +20,11 @@ class @Teacher extends client.Client
     @subscribe(callback)
     @lecture.init_teacher(@id)
     setInterval @poll_confusion, 1000
-    setInterval @poll_num_students, 990
+    setInterval @poll_num_students, 800
     setInterval @poll_understanding, 1010
 
-    setTimeout @send_conf_to_students, 500, 0
-    setTimeout @send_und_to_students, 600, 0
+    setTimeout @send_conf_to_students, 1005, 0
+    setTimeout @send_und_to_students, 1008, 0
 
 
   send_conf_to_students: (conf) =>
@@ -85,6 +85,11 @@ class @Teacher extends client.Client
       'get_id': (student_id) =>
         @pub.publish "#{student_id}.lecture.id", @lecture.id
         @pub.publish "#{student_id}.lecture.confusion_enabled", "#{@students_can_see_confusion}"
+
+        if @lecture.decay_mode
+          @pub.publish "#{student_id}.lecture.enable_decay", ""
+        else
+          @pub.publish "#{student_id}.lecture.disable_decay", "#{@lecture.confusion_timeout}"
         @lecture.add_student(student_id)
 
 
@@ -95,15 +100,18 @@ class @Teacher extends client.Client
     resource = parts[1] #lecture
     action = parts[2] #
 
-
     actions =
       'new_lecture': (m) =>
         @lecture.id = Number(m)
       'lecture': (m) =>
         @handle_lecture(action,m)
       'disconnect': (m) =>
-        #@remove_student(m)
+        console.log "Removing student: #{m}"
         @lecture.remove_student(m)
+      'options': (options) =>
+        if @send_to_client_cb?
+          @send_to_client_cb {'options':JSON.parse(options)}
+        
 
     actions[resource]? and actions[resource](message)
 
@@ -120,15 +128,20 @@ class @Teacher extends client.Client
 
   handle_decay_mode_true_from_socket: ->
     @lecture.set_decay_mode true
+    @pub.publish "#{@lecture.id}.broadcast.enable_decay",''
 
   handle_decay_mode_false_from_socket: ->
     @lecture.set_decay_mode false
+    @pub.publish "#{@lecture.id}.broadcast.disable_decay", "#{@lecture.confusion_timeout}"
 
   handle_new_confusion_timeout_from_socket: (num) ->
     new_num = Number(num)
     if new_num > 0
       @lecture.set_confusion_timeout new_num
       
+  
+  handle_options_from_socket: (options) =>
+    @pub.publish "#{@id}.options", JSON.stringify(options)
 
   handle_message_from_socket: (message) ->
     console.log message

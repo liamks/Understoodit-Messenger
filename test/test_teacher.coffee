@@ -5,11 +5,17 @@ s = require '../student'
 teacher1 =
   id: '234sf9i'
   screen_name: 'Susan'
+  options:
+    enable_decay: false
+    students_can_see_confusion: true
 
 teacher2 =
   id: '234sf9i'
   screen_name: 'Sally'
-
+  options:
+    enable_decay: false
+    students_can_see_confusion: true
+    
 student1 =
   id: '234asdf'
   screen_name: 'Tom'

@@ -12,13 +12,13 @@ ans = 'a4a28cd4d16d591fd70a71fa269bd6963f0059b3ca90f7caf91bbbb2b414e837'
 
 class SocketClient
   constructor: (@socket) ->
+    
     @socket.on 'start', @start
     @socket.on 'u', @understanding_from_client
     @socket.on 'c', @confusion_from_client
     @socket.on 'disconnect', @disconnect
 
   valid_tokens: (data) ->
-    console.log data
     empty_tokens = (data.token is '') and (data.token is '')
     client_has_token = data.token_1? and data.token_2?
     return unless client_has_token and not empty_tokens
@@ -51,6 +51,9 @@ class SocketClient
 
         @socket.on 'cto', (c) =>
           @decay_mode_timeout c
+
+        @socket.on 'options', (opt) =>
+          @handle_options opt
 
         @client = c
         @client.add_send_to_client @send_to_client
@@ -85,6 +88,9 @@ class SocketClient
   decay_mode_timeout: (t) =>
     @client.handle_new_confusion_timeout_from_socket(t) if @client?
 
+  handle_options: (options) =>
+    @client.handle_options_from_socket(options) if @client?
+
   disconnect: =>
     @client.disconnect() if @client?
       
@@ -100,6 +106,8 @@ class Server
       @io.enable 'browser client gzip'
       @io.enable 'browser client etag'
 
+    @io.configure 'development', () =>
+      @io.set 'log level', 1
 
 
   start: ->
@@ -109,12 +117,8 @@ class Server
   handler: (req, res) ->
 
   connection: (socket) ->
+    console.log 'HERERERERERERERE'
     new SocketClient socket
-
-
-
-
-
 
 
 server = new Server(3001)

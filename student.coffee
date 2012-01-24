@@ -41,6 +41,14 @@ class @Student extends client.Client
     if @send_to_client_cb?
       @send_to_client_cb {dc:''}
 
+  send_enable_decay_to_student: ->
+    if @send_to_client_cb?
+      @send_to_client_cb {ed:''}
+
+  send_disable_decay_to_student: (timeout) ->
+    if @send_to_client_cb?
+      @send_to_client_cb {dd:timeout}
+
   handle_message: (channel, message) =>
     parts = channel.split('.')
     resource = parts[1]
@@ -67,6 +75,12 @@ class @Student extends client.Client
             @send_enable_confusion_to_student()
           else
             @send_disable_confusion_to_student()
+        else if action is 'enable_decay'
+          @send_enable_decay_to_student()
+
+        else if action is 'disable_decay'
+          console.log 'herere'
+          @send_disable_decay_to_student(m)
 
       'broadcast': (m) =>
         if action is 'confusion'
@@ -80,6 +94,12 @@ class @Student extends client.Client
 
         else if action is 'disable_confusion'
           @send_disable_confusion_to_student()
+
+        else if action is 'enable_decay'
+          @send_enable_decay_to_student()
+
+        else if action is 'disable_decay'
+          @send_disable_decay_to_student(m)
 
     actions[resource] and actions[resource](message)
 

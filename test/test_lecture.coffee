@@ -6,6 +6,9 @@ l = require '../lecture'
 teacher1 =
   id: '234sf9i'
   screen_name: 'Susan'
+  options:
+    enable_decay: false
+    students_can_see_confusion: true
 
 student1 =
   id: '234asdf'
